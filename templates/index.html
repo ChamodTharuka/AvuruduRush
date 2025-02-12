@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avurudu Rush</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/tone"></script>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="timer">Time: <span id="timer">90</span>s</div>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="controls-hint">
+            <p>Use ← → arrows or tap sides to move</p>
+            <p>Space or tap top to jump</p>
+        </div>
+    </div>
+
+    <div id="gameOver" class="modal hidden">
+        <div class="modal-content">
+            <h2>Game Over!</h2>
+            <p>Your Score: <span id="finalScore">0</span></p>
+            <input type="text" id="playerName" placeholder="Enter your name">
+            <button onclick="submitScore()">Submit Score</button>
+            <button onclick="restartGame()">Play Again</button>
+            <a href="/leaderboard" class="leaderboard-link">View Leaderboard</a>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/audio.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/controls.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+</body>
+</html>

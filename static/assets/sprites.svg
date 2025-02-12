@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+  <symbol id="tuk-tuk" viewBox="0 0 60 40">
+    <rect x="5" y="20" width="50" height="20" fill="#FF6B6B"/>
+    <polygon points="0,40 60,40 50,20 10,20" fill="#2C3E50"/>
+    <circle cx="15" cy="40" r="5" fill="#333"/>
+    <circle cx="45" cy="40" r="5" fill="#333"/>
+  </symbol>
+  
+  <symbol id="kavum" viewBox="0 0 30 30">
+    <circle cx="15" cy="15" r="12" fill="#FFE66D"/>
+    <circle cx="15" cy="15" r="6" fill="#FFD700"/>
+  </symbol>
+  
+  <symbol id="kiribath" viewBox="0 0 30 30">
+    <rect x="5" y="5" width="20" height="20" fill="#4ECDC4"/>
+    <line x1="5" y1="15" x2="25" y2="15" stroke="#fff" stroke-width="2"/>
+  </symbol>
+</svg>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avurudu Rush - Leaderboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="leaderboard-container">
+        <h1>Top Scores</h1>
+        <div class="leaderboard">
+            {% for score in scores %}
+            <div class="score-entry">
+                <span class="player-name">{{ score.name }}</span>
+                <span class="player-score">{{ score.score }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <a href="/" class="play-again-btn">Play Again</a>
+    </div>
+</body>
+</html>
