@@ -15,22 +15,18 @@ class Game {
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;
 
-        // Define lanes
-        this.laneWidth = this.canvas.width / 2;
-        this.lanes = [
-            this.laneWidth / 2,  // Center of left lane
-            this.canvas.width - this.laneWidth / 2  // Center of right lane
-        ];
-        this.currentLane = 0;  // 0 = left lane, 1 = right lane
+        // Road boundaries
+        this.roadBoundaries = {
+            left: 0,
+            right: this.canvas.width
+        };
 
         this.player = {
-            x: this.lanes[this.currentLane],
+            x: this.canvas.width / 2,
             y: this.canvas.height - 100,
             width: 40,
-            height: 60,  // Make the tuk-tuk taller for top-down view
-            targetX: this.lanes[this.currentLane],
-            speed: 10,
-            lerpFactor: 0.15  // Smooth movement factor
+            height: 60,
+            speed: 6  // Reduced speed for smoother control
         };
 
         window.addEventListener('resize', () => this.resize());
@@ -40,11 +36,7 @@ class Game {
     resize() {
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;
-        this.laneWidth = this.canvas.width / 2;
-        this.lanes = [
-            this.laneWidth / 2,
-            this.canvas.width - this.laneWidth / 2
-        ];
+        this.roadBoundaries.right = this.canvas.width;
     }
 
     startGame() {
@@ -57,9 +49,8 @@ class Game {
 
     spawnItems() {
         if (this.items.length < 5) {
-            const lane = Math.floor(Math.random() * 2);
             this.items.push({
-                x: this.lanes[lane],
+                x: Math.random() * (this.roadBoundaries.right - 30),
                 y: -30,
                 width: 30,
                 height: 30,
@@ -71,9 +62,8 @@ class Game {
 
     spawnObstacles() {
         if (this.obstacles.length < 3) {
-            const lane = Math.floor(Math.random() * 2);
             this.obstacles.push({
-                x: this.lanes[lane],
+                x: Math.random() * (this.roadBoundaries.right - 40),
                 y: -50,
                 width: 40,
                 height: 60,
@@ -88,21 +78,19 @@ class Game {
         // Update road offset for scrolling effect
         this.roadOffset = (this.roadOffset + this.roadSpeed) % this.canvas.height;
 
-        // Lane-based movement
-        if (this.controls.left && this.currentLane > 0) {
-            this.currentLane = 0;
-            this.player.targetX = this.lanes[this.currentLane];
-            audioManager.playJump();
+        // Smooth movement
+        if (this.controls.left) {
+            this.player.x -= this.player.speed;
         }
-        if (this.controls.right && this.currentLane < 1) {
-            this.currentLane = 1;
-            this.player.targetX = this.lanes[this.currentLane];
-            audioManager.playJump();
+        if (this.controls.right) {
+            this.player.x += this.player.speed;
         }
 
-        // Smooth movement between lanes
-        const dx = this.player.targetX - this.player.x;
-        this.player.x += dx * this.player.lerpFactor;
+        // Keep player within road boundaries
+        this.player.x = Math.max(
+            this.player.width / 2,
+            Math.min(this.player.x, this.roadBoundaries.right - this.player.width / 2)
+        );
 
         // Update items
         this.items.forEach((item, index) => {

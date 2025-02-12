@@ -2,31 +2,20 @@ class Controls {
     constructor() {
         this.left = false;
         this.right = false;
-        this.lastKeyPress = 0;
-        this.keyDelay = 200; // Delay between lane changes in milliseconds
         this.setupKeyboard();
         this.setupTouch();
     }
 
     setupKeyboard() {
         document.addEventListener('keydown', (e) => {
-            const currentTime = Date.now();
-            if (currentTime - this.lastKeyPress < this.keyDelay) {
-                return; // Ignore rapid key presses
-            }
-
             switch(e.key) {
                 case 'ArrowLeft':
                     e.preventDefault();
                     this.left = true;
-                    this.right = false;
-                    this.lastKeyPress = currentTime;
                     break;
                 case 'ArrowRight':
                     e.preventDefault();
                     this.right = true;
-                    this.left = false;
-                    this.lastKeyPress = currentTime;
                     break;
             }
         });
@@ -52,11 +41,6 @@ class Controls {
             const rect = canvas.getBoundingClientRect();
             const x = touch.clientX - rect.left;
 
-            const currentTime = Date.now();
-            if (currentTime - this.lastKeyPress < this.keyDelay) {
-                return; // Ignore rapid touches
-            }
-
             if (x < rect.width / 2) {
                 this.left = true;
                 this.right = false;
@@ -64,7 +48,6 @@ class Controls {
                 this.right = true;
                 this.left = false;
             }
-            this.lastKeyPress = currentTime;
         });
 
         canvas.addEventListener('touchend', () => {
