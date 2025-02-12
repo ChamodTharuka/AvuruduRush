@@ -11,32 +11,26 @@ class Game {
         this.roadOffset = 0;
         this.roadSpeed = 5;
 
-        // Load road pattern
-        this.roadPattern = new Image();
-        this.roadPattern.src = 'data:image/svg+xml,' + encodeURIComponent(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="600">
-                <rect width="100" height="600" fill="#333333"/>
-                <rect x="45" y="0" width="10" height="60" fill="#FFFFFF"/>
-                <rect x="45" y="100" width="10" height="60" fill="#FFFFFF"/>
-                <rect x="45" y="200" width="10" height="60" fill="#FFFFFF"/>
-                <rect x="45" y="300" width="10" height="60" fill="#FFFFFF"/>
-                <rect x="45" y="400" width="10" height="60" fill="#FFFFFF"/>
-                <rect x="45" y="500" width="10" height="60" fill="#FFFFFF"/>
-            </svg>
-        `);
-
         // Set initial canvas dimensions
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;
 
+        // Define lanes
+        this.laneWidth = this.canvas.width / 2;
+        this.lanes = [
+            this.laneWidth / 2,  // Center of left lane
+            this.canvas.width - this.laneWidth / 2  // Center of right lane
+        ];
+        this.currentLane = 0;  // 0 = left lane, 1 = right lane
+
         this.player = {
-            x: this.canvas.width / 2,
+            x: this.lanes[this.currentLane],
             y: this.canvas.height - 100,
-            width: 60,
-            height: 40,
-            speed: 8,
-            jumping: false,
-            velocity: 0
+            width: 40,
+            height: 60,  // Make the tuk-tuk taller for top-down view
+            targetX: this.lanes[this.currentLane],
+            speed: 10,
+            lerpFactor: 0.15  // Smooth movement factor
         };
 
         window.addEventListener('resize', () => this.resize());
@@ -46,6 +40,11 @@ class Game {
     resize() {
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;
+        this.laneWidth = this.canvas.width / 2;
+        this.lanes = [
+            this.laneWidth / 2,
+            this.canvas.width - this.laneWidth / 2
+        ];
     }
 
     startGame() {
@@ -58,8 +57,9 @@ class Game {
 
     spawnItems() {
         if (this.items.length < 5) {
+            const lane = Math.floor(Math.random() * 2);
             this.items.push({
-                x: Math.random() * (this.canvas.width - 30),
+                x: this.lanes[lane],
                 y: -30,
                 width: 30,
                 height: 30,
@@ -71,11 +71,12 @@ class Game {
 
     spawnObstacles() {
         if (this.obstacles.length < 3) {
+            const lane = Math.floor(Math.random() * 2);
             this.obstacles.push({
-                x: Math.random() * (this.canvas.width - 40),
+                x: this.lanes[lane],
                 y: -50,
                 width: 40,
-                height: 40,
+                height: 60,
                 speed: 3 + Math.random()
             });
         }
@@ -84,34 +85,24 @@ class Game {
     update() {
         if (this.gameOver) return;
 
-        // Update road offset
-        this.roadOffset = (this.roadOffset + this.roadSpeed) % 600;
+        // Update road offset for scrolling effect
+        this.roadOffset = (this.roadOffset + this.roadSpeed) % this.canvas.height;
 
-        // Player movement
-        if (this.controls.left) this.player.x -= this.player.speed;
-        if (this.controls.right) this.player.x += this.player.speed;
-
-        // Jumping
-        if (this.controls.jump && !this.player.jumping) {
-            this.player.jumping = true;
-            this.player.velocity = -15;
+        // Lane-based movement
+        if (this.controls.left && this.currentLane > 0) {
+            this.currentLane = 0;
+            this.player.targetX = this.lanes[this.currentLane];
+            audioManager.playJump();
+        }
+        if (this.controls.right && this.currentLane < 1) {
+            this.currentLane = 1;
+            this.player.targetX = this.lanes[this.currentLane];
             audioManager.playJump();
         }
 
-        // Apply gravity
-        if (this.player.jumping) {
-            this.player.y += this.player.velocity;
-            this.player.velocity += 0.8;
-
-            if (this.player.y >= this.canvas.height - 100) {
-                this.player.y = this.canvas.height - 100;
-                this.player.jumping = false;
-                this.player.velocity = 0;
-            }
-        }
-
-        // Keep player in bounds
-        this.player.x = Math.max(0, Math.min(this.player.x, this.canvas.width - this.player.width));
+        // Smooth movement between lanes
+        const dx = this.player.targetX - this.player.x;
+        this.player.x += dx * this.player.lerpFactor;
 
         // Update items
         this.items.forEach((item, index) => {
@@ -152,34 +143,52 @@ class Game {
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Draw scrolling road pattern
-        const pattern = this.ctx.createPattern(this.roadPattern, 'repeat');
-        this.ctx.save();
-        this.ctx.translate(0, this.roadOffset);
-        this.ctx.fillStyle = pattern;
-        this.ctx.fillRect(0, -600, this.canvas.width, this.canvas.height + 600);
-        this.ctx.restore();
+        // Draw grass background
+        this.ctx.fillStyle = '#85A878';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw road
+        this.ctx.fillStyle = '#333333';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw lane markers
+        const markerHeight = 40;
+        const markerGap = 60;
+        const totalMarkers = Math.ceil(this.canvas.height / (markerHeight + markerGap));
+
+        this.ctx.fillStyle = '#FFFFFF';
+        for (let i = 0; i < totalMarkers; i++) {
+            const y = ((i * (markerHeight + markerGap) + this.roadOffset) % this.canvas.height) - markerHeight;
+            this.ctx.fillRect(this.canvas.width / 2 - 5, y, 10, markerHeight);
+        }
 
         // Draw player (tuk-tuk)
         this.ctx.fillStyle = '#FF6B6B';
-        this.ctx.fillRect(this.player.x, this.player.y, this.player.width, this.player.height);
+        const playerX = this.player.x - this.player.width / 2;
+        const playerY = this.player.y;
+        this.ctx.fillRect(playerX, playerY, this.player.width, this.player.height);
 
         // Draw items
         this.items.forEach(item => {
             this.ctx.fillStyle = item.type === 'kavum' ? '#FFE66D' : '#4ECDC4';
-            this.ctx.fillRect(item.x, item.y, item.width, item.height);
+            const itemX = item.x - item.width / 2;
+            this.ctx.fillRect(itemX, item.y, item.width, item.height);
         });
 
         // Draw obstacles
         this.obstacles.forEach(obstacle => {
             this.ctx.fillStyle = '#2C3E50';
-            this.ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            const obstacleX = obstacle.x - obstacle.width / 2;
+            this.ctx.fillRect(obstacleX, obstacle.y, obstacle.width, obstacle.height);
         });
     }
 
     checkCollision(rect1, rect2) {
-        return rect1.x < rect2.x + rect2.width &&
-               rect1.x + rect1.width > rect2.x &&
+        const rect1X = rect1.x - rect1.width / 2;
+        const rect2X = rect2.x - rect2.width / 2;
+
+        return rect1X < rect2X + rect2.width &&
+               rect1X + rect1.width > rect2X &&
                rect1.y < rect2.y + rect2.height &&
                rect1.y + rect1.height > rect2.y;
     }
