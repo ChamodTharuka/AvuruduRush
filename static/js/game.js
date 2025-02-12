@@ -1,3 +1,15 @@
+const tukTukImg = new Image();
+tukTukImg.src = '/static/assets/car.png';
+
+const kavumImg = new Image();
+kavumImg.src = '/static/assets/kavum.png'; // Updated image for Kavum
+
+const kiribathImg = new Image();
+kiribathImg.src = '/static/assets/kiribath.png'; // Updated image for Kiribath
+
+const obstacleImg = new Image();
+obstacleImg.src = '/static/assets/obstacle.png'; // Updated image for Obstacle
+
 class Game {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
@@ -128,6 +140,8 @@ class Game {
         this.spawnObstacles();
     }
 
+
+    
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -144,30 +158,42 @@ class Game {
         const markerGap = 60;
         const totalMarkers = Math.ceil(this.canvas.height / (markerHeight + markerGap));
 
-        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fillStyle = '#ffffff';
         for (let i = 0; i < totalMarkers; i++) {
             const y = ((i * (markerHeight + markerGap) + this.roadOffset) % this.canvas.height) - markerHeight;
             this.ctx.fillRect(this.canvas.width / 2 - 5, y, 10, markerHeight);
         }
+ 
+        // Draw tuk-tuk (player)
+        // Increase Tuk-Tuk size by multiplying width & height
+        const tukTukWidth = this.player.width * 1.8;  // Increase width by 1.5x
+        const tukTukHeight = this.player.height * 1.3;  // Increase height by 1.5x
 
-        // Draw player (tuk-tuk)
-        this.ctx.fillStyle = '#FF6B6B';
-        const playerX = this.player.x - this.player.width / 2;
-        const playerY = this.player.y;
-        this.ctx.fillRect(playerX, playerY, this.player.width, this.player.height);
+        // Adjust position to center the larger image
+        const playerX = this.player.x - tukTukWidth / 2;
+        const playerY = this.player.y - tukTukHeight / 2;
 
-        // Draw items
+        // Draw larger Tuk-Tuk
+        this.ctx.drawImage(tukTukImg, playerX, playerY, tukTukWidth, tukTukHeight);
+
+
+        // Draw items (Kavum & Kiribath)
         this.items.forEach(item => {
-            this.ctx.fillStyle = item.type === 'kavum' ? '#FFE66D' : '#4ECDC4';
-            const itemX = item.x - item.width / 2;
-            this.ctx.fillRect(itemX, item.y, item.width, item.height);
+            var itemX = item.x - item.width / 2;
+            var itemY = item.y;
+
+            if (item.type === 'kavum') {
+                this.ctx.drawImage(kavumImg, itemX, itemY, item.width, item.height);
+            } else {
+                this.ctx.drawImage(kiribathImg, itemX, itemY, item.width, item.height);
+            }
         });
 
         // Draw obstacles
         this.obstacles.forEach(obstacle => {
-            this.ctx.fillStyle = '#2C3E50';
-            const obstacleX = obstacle.x - obstacle.width / 2;
-            this.ctx.fillRect(obstacleX, obstacle.y, obstacle.width, obstacle.height);
+            var obstacleX = obstacle.x - obstacle.width / 2;
+            var obstacleY = obstacle.y;
+            this.ctx.drawImage(obstacleImg, obstacleX, obstacleY, obstacle.width, obstacle.height);
         });
     }
 
