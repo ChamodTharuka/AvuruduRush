@@ -8,6 +8,22 @@ class Game {
         this.gameOver = false;
         this.items = [];
         this.obstacles = [];
+        this.roadOffset = 0;
+        this.roadSpeed = 5;
+
+        // Load road pattern
+        this.roadPattern = new Image();
+        this.roadPattern.src = 'data:image/svg+xml,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="600">
+                <rect width="100" height="600" fill="#333333"/>
+                <rect x="45" y="0" width="10" height="60" fill="#FFFFFF"/>
+                <rect x="45" y="100" width="10" height="60" fill="#FFFFFF"/>
+                <rect x="45" y="200" width="10" height="60" fill="#FFFFFF"/>
+                <rect x="45" y="300" width="10" height="60" fill="#FFFFFF"/>
+                <rect x="45" y="400" width="10" height="60" fill="#FFFFFF"/>
+                <rect x="45" y="500" width="10" height="60" fill="#FFFFFF"/>
+            </svg>
+        `);
 
         // Set initial canvas dimensions
         this.canvas.width = this.canvas.clientWidth;
@@ -18,7 +34,7 @@ class Game {
             y: this.canvas.height - 100,
             width: 60,
             height: 40,
-            speed: 8, // Increased speed for better responsiveness
+            speed: 8,
             jumping: false,
             velocity: 0
         };
@@ -67,6 +83,9 @@ class Game {
 
     update() {
         if (this.gameOver) return;
+
+        // Update road offset
+        this.roadOffset = (this.roadOffset + this.roadSpeed) % 600;
 
         // Player movement
         if (this.controls.left) this.player.x -= this.player.speed;
@@ -132,6 +151,14 @@ class Game {
 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw scrolling road pattern
+        const pattern = this.ctx.createPattern(this.roadPattern, 'repeat');
+        this.ctx.save();
+        this.ctx.translate(0, this.roadOffset);
+        this.ctx.fillStyle = pattern;
+        this.ctx.fillRect(0, -600, this.canvas.width, this.canvas.height + 600);
+        this.ctx.restore();
 
         // Draw player (tuk-tuk)
         this.ctx.fillStyle = '#FF6B6B';

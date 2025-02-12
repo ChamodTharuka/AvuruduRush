@@ -5,14 +5,24 @@
     <circle cx="15" cy="40" r="5" fill="#333"/>
     <circle cx="45" cy="40" r="5" fill="#333"/>
   </symbol>
-  
+
   <symbol id="kavum" viewBox="0 0 30 30">
     <circle cx="15" cy="15" r="12" fill="#FFE66D"/>
     <circle cx="15" cy="15" r="6" fill="#FFD700"/>
   </symbol>
-  
+
   <symbol id="kiribath" viewBox="0 0 30 30">
     <rect x="5" y="5" width="20" height="20" fill="#4ECDC4"/>
     <line x1="5" y1="15" x2="25" y2="15" stroke="#fff" stroke-width="2"/>
+  </symbol>
+
+  <symbol id="road" viewBox="0 0 100 600">
+    <rect width="100" height="600" fill="#333333"/>
+    <rect x="45" y="0" width="10" height="60" fill="#FFFFFF"/>
+    <rect x="45" y="100" width="10" height="60" fill="#FFFFFF"/>
+    <rect x="45" y="200" width="10" height="60" fill="#FFFFFF"/>
+    <rect x="45" y="300" width="10" height="60" fill="#FFFFFF"/>
+    <rect x="45" y="400" width="10" height="60" fill="#FFFFFF"/>
+    <rect x="45" y="500" width="10" height="60" fill="#FFFFFF"/>
   </symbol>
 </svg>
