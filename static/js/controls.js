@@ -9,6 +9,7 @@ class Controls {
 
     setupKeyboard() {
         document.addEventListener('keydown', (e) => {
+            e.preventDefault(); // Prevent default keyboard behavior
             switch(e.key) {
                 case 'ArrowLeft':
                     this.left = true;
@@ -17,7 +18,9 @@ class Controls {
                     this.right = true;
                     break;
                 case ' ':
+                case 'Space':
                     this.jump = true;
+                    e.preventDefault(); // Prevent page scrolling on space
                     break;
             }
         });
@@ -31,6 +34,7 @@ class Controls {
                     this.right = false;
                     break;
                 case ' ':
+                case 'Space':
                     this.jump = false;
                     break;
             }

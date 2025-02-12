@@ -8,18 +8,21 @@ class Game {
         this.gameOver = false;
         this.items = [];
         this.obstacles = [];
-        
+
+        // Set initial canvas dimensions
+        this.canvas.width = this.canvas.clientWidth;
+        this.canvas.height = this.canvas.clientHeight;
+
         this.player = {
             x: this.canvas.width / 2,
             y: this.canvas.height - 100,
             width: 60,
             height: 40,
-            speed: 5,
+            speed: 8, // Increased speed for better responsiveness
             jumping: false,
             velocity: 0
         };
 
-        this.resize();
         window.addEventListener('resize', () => this.resize());
         this.startGame();
     }
@@ -68,7 +71,7 @@ class Game {
         // Player movement
         if (this.controls.left) this.player.x -= this.player.speed;
         if (this.controls.right) this.player.x += this.player.speed;
-        
+
         // Jumping
         if (this.controls.jump && !this.player.jumping) {
             this.player.jumping = true;
@@ -94,7 +97,7 @@ class Game {
         // Update items
         this.items.forEach((item, index) => {
             item.y += item.speed;
-            
+
             // Collision detection
             if (this.checkCollision(this.player, item)) {
                 this.score += item.type === 'kavum' ? 10 : 20;
@@ -111,7 +114,7 @@ class Game {
         // Update obstacles
         this.obstacles.forEach((obstacle, index) => {
             obstacle.y += obstacle.speed;
-            
+
             if (this.checkCollision(this.player, obstacle)) {
                 this.timeLeft -= 5;
                 this.obstacles.splice(index, 1);
@@ -159,7 +162,7 @@ class Game {
         const timer = setInterval(() => {
             this.timeLeft--;
             timerElement.textContent = this.timeLeft;
-            
+
             if (this.timeLeft <= 0) {
                 clearInterval(timer);
                 this.endGame();
